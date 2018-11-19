@@ -1,0 +1,28 @@
+{
+  "name": "koa-actionpack",
+  "version": "1.0.0",
+  "description": "A koa-router generator and dispatcher",
+  "dependencies": {
+    "koa-router": "^7.4.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fredxiaoF/koa-actionpack.git"
+  },
+  "keywords": [
+    "actionpack",
+    "dispatcher",
+    "restful",
+    "router"
+  ],
+  "author": "Fred Shaw",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fredxiaoF/koa-actionpack/issues"
+  },
+  "homepage": "https://github.com/fredxiaoF/koa-actionpack#readme"
+}
