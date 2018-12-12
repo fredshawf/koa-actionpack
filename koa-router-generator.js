@@ -51,10 +51,15 @@ class RouterGenerator {
   }
   
   namespace(space, func) {
-    new Namespace(this.router, space).draw_func(func);
+    new NamespaceGenerator(this.router, space).draw_func(func);
   }
   
   resources(resource_name, opts={}, func) {
+    if (typeof opts === 'function') {
+      func = opts;
+      opts = {};
+    }
+    
     let namespace_names = Object.assign([], this.namespace_names);
     if (opts.namespace) namespace_names.push(opts.namespace);
     delete opts.namespace
@@ -146,6 +151,11 @@ class ResourcesGenerator extends RouterGenerator {
   }
   
   resources(resource_name, opts = {}, func) {
+    if (typeof opts === 'function') {
+      func = opts;
+      opts = {};
+    }
+    
     Object.assign(opts, {nested: this});
     super.resources(resource_name, opts, func);
   }
