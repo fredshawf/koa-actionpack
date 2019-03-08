@@ -26,27 +26,11 @@ module.exports = class RouterDispatcher {
       let request_opts = {};
       Object.assign(request_opts, ctx.params);
       Object.assign(request_opts, this.opts);
-    
-      let controller = this.load_controller(request_opts);
-      let processor = new controller(ctx);
-      processor.ctx = ctx;
-    
-      let proxy = new Proxy(processor, {
-        get: (tar, attr) => { return ctx[attr] ? ctx[attr] : tar[attr]; }
-      });
-    
-      let action = proxy[request_opts.action];
       
-      if (action) {
-        if (this.constructor.logger) {
-          this.constructor.logger.debug(`Processing by ${this.controller_name(request_opts)}#${action.name}`);
-          this.constructor.logger.debug(`  Parameters: ${JSON.stringify(ctx.params)}`);
-        }
-        
-        await action.apply(proxy);
-      } else {
-        ctx.throw(500, `Action: ${request_opts.action} is missing in Controller: ${this.controller_name(request_opts)}`)
-      }
+      let controller = this.load_controller(request_opts);
+      let action = request_opts.action;
+      
+      return await controller.process(ctx, action);
     }
   }
   
