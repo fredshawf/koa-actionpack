@@ -1,20 +1,7 @@
-const RouterDispatcher = require('./koa-router-dispatcher');
-const Router = require('koa-router');
+const RouterDispatcher = require('./router_dispatcher');
+
 
 class RouterGenerator {
-  
-  
-  static draw(path, opts={}) {
-    let func = require(path);
-    let router = new Router();
-    let generator = new RouterGenerator(router);
-    
-    RouterDispatcher.logger = opts.logger;
-    generator.draw_func(func);
-    
-    return router;
-  }
-  
   
   static define_generator_methods() {
     for(let method of ['get', 'put', 'post', 'patch', 'delete']) {
@@ -30,14 +17,17 @@ class RouterGenerator {
         if (target.namespace) namespace_names.push(target.namespace);
         if (typeof(target) === 'object') Object.assign(target, {namespace: namespace_names});
         
-        this.router[method](path_prefix + path, new RouterDispatcher(target).dispatch());
+        this.route_set.add_route(method, path_prefix + path, new RouterDispatcher(target).dispatch())
       }
     }
     this.prototype['del'] = this.prototype['delete']; 
   }
   
-  constructor(router) {
-    this.router = router;
+  static set_route_set(route_set) {
+    this.prototype['route_set'] = route_set;
+  }
+  
+  constructor() {
     this.namespace_names = [];
   }
   
@@ -51,7 +41,7 @@ class RouterGenerator {
   }
   
   namespace(space, func) {
-    new NamespaceGenerator(this.router, space).draw_func(func);
+    new NamespaceGenerator(space).draw_func(func);
   }
   
   resources(resource_name, opts={}, func) {
@@ -65,7 +55,7 @@ class RouterGenerator {
     delete opts.namespace
     opts.namespace_names = namespace_names;
     
-    let r_generator = new ResourcesGenerator(this.router, resource_name, opts);
+    let r_generator = new ResourcesGenerator(resource_name, opts);
     r_generator.generate_restful_routers();
     if (func) r_generator.draw_func(func);
   }
@@ -77,13 +67,13 @@ RouterGenerator.define_generator_methods()
 
 
 class NamespaceGenerator extends RouterGenerator {
-  constructor(router, ...space) {
-    super(router);
+  constructor(...space) {
+    super();
     this.namespace_names = this.namespace_names.concat(space);
   }
   
   namespace(space, func) {
-    new this.constructor(this.router, ...this.namespace_names.concat(space)).draw_func(func);
+    new this.constructor(...this.namespace_names.concat(space)).draw_func(func);
   } 
 }
 
@@ -99,8 +89,8 @@ class ResourcesGenerator extends RouterGenerator {
   }
   
   
-  constructor(router, resource_name, opts) {
-    super(router);
+  constructor(resource_name, opts) {
+    super();
     this.resource_name = resource_name;
     this.nested = opts.nested;
     this.namespace_names = opts.namespace_names;
@@ -161,11 +151,11 @@ class ResourcesGenerator extends RouterGenerator {
   }
   
   member(func) {
-    new MemberResourcesGenerator(this.router, this.resource_name, Object.assign({}, this.opts)).draw_func(func)
+    new MemberResourcesGenerator(this.resource_name, Object.assign({}, this.opts)).draw_func(func)
   }
   
   collection(func) {
-    new CollectionResourcesGenerator(this.router, this.resource_name, Object.assign({}, this.opts)).draw_func(func)
+    new CollectionResourcesGenerator(this.resource_name, Object.assign({}, this.opts)).draw_func(func)
   }
   
 }

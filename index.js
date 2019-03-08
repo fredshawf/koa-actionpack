@@ -1,6 +1,6 @@
-const RouterGenerator = require("./koa-router-generator");
+const RouterSet = require("./route_set");
 
 module.exports = {
-  'RouterGenerator': RouterGenerator
+  'RouteSet': RouterSet
   // 'BaseController' : ...
 }
