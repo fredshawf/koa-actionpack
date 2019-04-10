@@ -5,6 +5,11 @@ class BaseController {
 
   constructor(ctx) {
     this.ctx = ctx;
+    if (global.Koa && Koa.logger) {
+      this.logger = Koa.logger;
+    }
+
+    this.logger 
 
     this._init_method_alias()
 
@@ -58,6 +63,11 @@ class BaseController {
 
     if (!processor[action]) {
       ctx.throw(500, `Action: ${request_opts.action} is missing in Controller: ${this.controller_name(request_opts)}`);
+    }
+
+    if (processor.logger) {
+      processor.logger.debug(`Processing by ${this.name}#${action}`);
+      processor.logger.debug(`  Parameters: ${JSON.stringify(ctx.params)}`);
     }
 
     let before_callback_result = processor._filter.run_callback('before_action', processor, function (callback_result, controller) {

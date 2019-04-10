@@ -1,9 +1,10 @@
 {
   "name": "koa-actionpack",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A koa-router generator and dispatcher",
   "dependencies": {
-    "koa-router": "^7.4.0"
+    "koa-router": "^7.4.0",
+    "require-directory": "^2.1.1"
   },
   "main": "index.js",
   "scripts": {

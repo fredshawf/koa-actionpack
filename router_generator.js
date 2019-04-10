@@ -6,18 +6,25 @@ class RouterGenerator {
   static define_generator_methods() {
     for(let method of ['get', 'put', 'post', 'patch', 'delete']) {
       this.prototype[method] = function (path, target) {
-        
+        // parse target if it't type is string like 'xxx#yyy'
+        if (typeof(target) === 'string') {
+          let [controller_name, action_name] = target.split('#');
+          target = { controller: controller_name, action: action_name };
+        }
+
+        // serialize path
         let path_prefix = this.path_prefix();
         if (target.prefix) path_prefix += target.prefix[0] === '/' ? target.prefix : `/${target.prefix}`;
         if (!target.prefix && target.namespace) path_prefix += `/${target.namespace}`;
         
         if (!(path[0] === '/')) path = `/${path}`;
         
+        // serialize middleware namespace
         let namespace_names = Object.assign([], this.namespace_names)
         if (target.namespace) namespace_names.push(target.namespace);
         if (typeof(target) === 'object') Object.assign(target, {namespace: namespace_names});
         
-        this.route_set.add_route(method, path_prefix + path, new RouterDispatcher(target).dispatch())
+        this.route_set.add_route(method, path_prefix + path, new RouterDispatcher(target, this.route_set).dispatch())
       }
     }
     this.prototype['del'] = this.prototype['delete']; 
